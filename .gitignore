@@ -1,0 +1,61 @@
+## backend
+
+penny-wise-backend/.phpunit.cache
+penny-wise-backend/node_modules
+penny-wise-backend/public/build
+penny-wise-backend/public/hot
+penny-wise-backend/public/storage
+penny-wise-backend/storage/*.key
+penny-wise-backend/vendor
+penny-wise-backend/.env
+penny-wise-backend/.env.backup
+penny-wise-backend/.env.production
+penny-wise-backend/.phpactor.json
+penny-wise-backend/.phpunit.result.cache
+penny-wise-backend/Homestead.json
+penny-wise-backend/Homestead.yaml
+penny-wise-backend/auth.json
+penny-wise-backend/npm-debug.log
+penny-wise-backend/yarn-error.log
+penny-wise-backend/.fleet
+penny-wise-backend/.idea
+penny-wise-backend/.vscode
+penny-wise-backend/.zed
+
+
+## frontend
+
+# dependencies
+penny-wise-frontend/node_modules
+penny-wise-frontend/.pnp
+penny-wise-frontend/.pnp.js
+penny-wise-frontend/.yarn/install-state.gz
+
+# testing
+penny-wise-frontend/coverage
+
+# next.js
+penny-wise-frontend/.next/
+penny-wise-frontend/out/
+
+# production
+penny-wise-frontend/build
+
+# misc
+penny-wise-frontend/.DS_Store
+penny-wise-frontend/*.pem
+
+# debug
+penny-wise-frontend/npm-debug.log*
+penny-wise-frontend/yarn-debug.log*
+penny-wise-frontend/yarn-error.log*
+
+# local env files
+penny-wise-frontend/.env*.local
+
+# vercel
+penny-wise-frontend/.vercel
+
+# typescript
+penny-wise-frontend/*.tsbuildinfo
+penny-wise-frontend/next-env.d.ts
