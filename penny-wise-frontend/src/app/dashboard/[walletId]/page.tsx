@@ -26,6 +26,7 @@ import { TransactionTabs } from "@/features/transactions/transaction-tabs";
 import { UpdateWalletDialog } from "@/features/transactions/update-wallet-dialog";
 import { useWallet } from "@/features/transactions/use-wallet";
 import { useAuth } from "@/hooks/auth";
+import { Download } from 'lucide-react';
 
 export default function Wallet({ params }: { params: { walletId: string } }) {
   useAuth({ middleware: "auth" });
@@ -40,6 +41,38 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
     updateWallet,
     wallet,
   } = useWallet(params.walletId);
+
+  const handleExport = async (): Promise<void> => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/export`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+    });
+
+
+    if (!response.ok) {
+      throw new Error('Failed to export transactions');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transactions.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error(error);
+    alert('Export failed');
+  }
+};
+
 
   useEffect(() => {
     if (error) {
@@ -90,6 +123,14 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
                   </p>
                 </HoverCardContent>
               </HoverCard>
+
+              <button
+                onClick={handleExport}
+                className="p-2 rounded bg-gray-200 hover:bg-gray-300"
+                title="Export Transactions"
+              >
+                <Download className="w-5 h-5 text-gray-700" />
+              </button>
 
               <UpdateWalletDialog wallet={wallet} updateWallet={updateWallet} />
               <DeleteWalletDialog wallet={wallet} deleteWallet={deleteWallet} />
