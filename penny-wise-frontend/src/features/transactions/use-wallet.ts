@@ -8,6 +8,7 @@ import type {
   Category,
   UpdateWalletPayload,
   Wallet,
+  AddRecurringTransactionPayload
 } from "./types";
 
 export function useWallet(walletId: string) {
@@ -65,6 +66,23 @@ export function useWallet(walletId: string) {
       return { error: "Failed to add transaction." };
     }
   }
+
+  async function addRecurringTransaction(payload: AddRecurringTransactionPayload) {
+  try {
+    const response = await axiosInstance.post<{ wallet: Wallet }>(
+      `/api/recurring-transactions`,
+      {
+        ...payload,
+        wallet_id: walletId,
+      }
+    );
+
+    setWallet(response.data.wallet);
+    setCategories([...categories, payload.category_name]);
+  } catch {
+    return { error: "Failed to add recurring transaction." };
+  }
+}
 
   async function deleteTransaction(transactionId: number) {
     if (!wallet) {
@@ -130,6 +148,7 @@ export function useWallet(walletId: string) {
 
   return {
     addTransaction,
+    addRecurringTransaction,
     categories,
     deleteTransaction,
     deleteWallet,

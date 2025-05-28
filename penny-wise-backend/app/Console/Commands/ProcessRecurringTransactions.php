@@ -40,10 +40,10 @@ class ProcessRecurringTransactions extends Command
             'category_id' => $recurring->category_id,
             'amount'      => $recurring->amount,
             'currency'    => $recurring->wallet->currency ?? 'USD',
-            'type'        => $recurring->type,
             'description' => $recurring->description,
             'date'        => $today,
         ]);
+
 
         // Calculate next run date
         $nextRun = Carbon::parse($recurring->next_run)->copy();
