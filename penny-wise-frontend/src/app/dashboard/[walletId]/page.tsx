@@ -6,7 +6,7 @@ import {
   QuestionMarkIcon,
 } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { Header } from "@/components/header";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddTransactionDialog } from "@/features/transactions/add-transaction-dialog";
+import { AddRecurringTransactionDialog } from "@/features/transactions/add-recurring-dialog";
 import { columns } from "@/features/transactions/columns";
 import { DataTable } from "@/features/transactions/data-table";
 import { DeleteWalletDialog } from "@/features/transactions/delete-wallet-dialog";
@@ -26,7 +27,8 @@ import { TransactionTabs } from "@/features/transactions/transaction-tabs";
 import { UpdateWalletDialog } from "@/features/transactions/update-wallet-dialog";
 import { useWallet } from "@/features/transactions/use-wallet";
 import { useAuth } from "@/hooks/auth";
-import { Download } from 'lucide-react';
+import { Download, FileUp } from 'lucide-react';
+import type { AddRecurringTransactionPayload } from "@/features/transactions/types";
 
 export default function Wallet({ params }: { params: { walletId: string } }) {
   useAuth({ middleware: "auth" });
@@ -42,6 +44,41 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
     wallet,
   } = useWallet(params.walletId);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/import`, {
+      method: 'POST',
+      headers: {
+        "Accept": "application/json", // specify expected response type
+      },
+      credentials: 'include',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to import transactions');
+    }
+
+    alert('Transactions imported successfully!');
+    // Optionally refresh data
+  } catch (error) {
+    console.error(error);
+    alert('Import failed');
+  }
+};
+
   const handleExport = async (): Promise<void> => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/export`, {
@@ -52,17 +89,20 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
       },
     });
 
-
     if (!response.ok) {
       throw new Error('Failed to export transactions');
     }
 
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-
+    if (!wallet?.name) {
+      alert("Wallet not loaded yet.");
+      return;
+    }
+    const safeName = (wallet.name ?? 'wallet').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'transactions.xlsx';
+    a.download = `${wallet.name}_transactions.xlsx`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -73,12 +113,42 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
   }
 };
 
-
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
   }, [error]);
+
+  async function addRecurringTransaction(payload: AddRecurringTransactionPayload) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recurring-transactions`, {
+      method: "POST",
+      credentials: 'include', // important if backend uses cookie-based auth
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json", // specify expected response type
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        console.error('Failed to parse error response as JSON', e);
+        return { error: `Unexpected error (status ${response.status})` };
+      }
+      console.error('Validation errors:', errorData);
+      return { error: errorData.message || "Failed to create recurring transaction" };
+    }
+
+    return undefined;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return { error: "Something went wrong while creating recurring transaction." };
+  }
+}
 
   return (
     <div className="grid min-h-screen grid-rows-[auto,_1fr,_auto]">
@@ -126,10 +196,26 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
 
               <button
                 onClick={handleExport}
-                className="p-2 rounded bg-gray-200 hover:bg-gray-300"
+                className="p-2 hover"
                 title="Export Transactions"
               >
-                <Download className="w-5 h-5 text-gray-700" />
+                <FileUp className="w-5 h-5" />
+              </button>
+
+             <input
+                type="file"
+                accept=".xlsx"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+
+              <button
+                onClick={handleImportClick}
+                className="p-2 hover"
+                title="Import Transactions"
+              >
+                <Download className="w-5 h-5" />
               </button>
 
               <UpdateWalletDialog wallet={wallet} updateWallet={updateWallet} />
@@ -144,10 +230,18 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
           <section className="space-y-4">
             <TransactionTabs wallet={wallet} />
 
-            <AddTransactionDialog
-              addTransaction={addTransaction}
-              categories={categories}
-            />
+            <div className="flex items-center gap-x-2">
+              <AddTransactionDialog
+                addTransaction={addTransaction}
+                categories={categories}
+              />
+
+              <AddRecurringTransactionDialog
+                walletId={wallet.id}
+                addRecurringTransaction={addRecurringTransaction}
+                categories={categories}
+              />
+            </div>
 
             {wallet.transactions.length === 0 ? (
               <Alert variant="default">

@@ -259,9 +259,13 @@ public function import(Request $request)
         'file' => 'required|file|mimes:xlsx,csv'
     ]);
 
-    Excel::import(new TransactionsImport, $request->file('file'));
-    
-    return response()->json(['message' => 'Imported successfully']);
+    try {
+        Excel::import(new TransactionsImport, $request->file('file'));
+        return response()->json(['message' => 'Imported successfully']);
+    } catch (\Exception $e) {
+        \Log::error('Import failed: ' . $e->getMessage());
+        return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 500);
+    }
 }
 
 }

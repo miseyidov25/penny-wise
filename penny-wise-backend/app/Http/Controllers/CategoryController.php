@@ -15,21 +15,21 @@ class CategoryController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
 
-        try {
-            Category::create([
-                'user_id' => Auth::id(),
-                'name' => $request->name,
-            ]);
-            return redirect()->route('categories.index')->with('success', 'Category created successfully.');
-        } catch (QueryException $e) {
-            return response()->json(['error' => 'A category with this name already exists'], 409);
-        }
-    }
+    $category = Category::firstOrCreate(
+        [
+            'name' => $request->name,
+            'user_id' => Auth::id()
+        ]
+    );
+
+    return redirect()->route('categories.index')->with('success', 'Category created or reused successfully.');
+}
+
 
     public function update(Request $request, Category $category)
     {

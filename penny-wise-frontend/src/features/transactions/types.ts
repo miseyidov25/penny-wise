@@ -42,3 +42,13 @@ export interface UpdateWalletPayload {
   name: string;
   currency: string;
 }
+
+export type AddRecurringTransactionPayload = {
+  wallet_id: number;
+  category_name: string;
+  amount: string;
+  description?: string;
+  interval: "daily" | "weekly" | "monthly" | "yearly";
+  next_run: string;
+  end_date?: string;
+};
