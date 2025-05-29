@@ -1,4 +1,3 @@
-```
 # PennyWise
 
 PennyWise is a budget management web platform designed to help users efficiently manage their finances through a wallet system. The application consists of two main parts:
@@ -6,19 +5,21 @@ PennyWise is a budget management web platform designed to help users efficiently
 - **Backend:** Laravel API handling authentication, wallets, transactions, and categories.
 - **Frontend:** Next.js React app for the user interface.
 
----
-
 ## Repository Structure
 
+Clone the repository:
+
+```bash
+git clone https://github.com/miseyidov25/penny-wise.git
 ```
 
-git clone https://github.com/miseyidov25/penny-wise.git
+Project structure:
 
+```
 pennywise/
-├── penny-wise-backend/ # Laravel backend API
-└── penny-wise-frontend/ # Next.js frontend app
-
-````
+├── penny-wise-backend/   # Laravel backend API
+└── penny-wise-frontend/  # Next.js frontend app
+```
 
 ---
 
@@ -37,9 +38,9 @@ cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan serve
-````
+```
 
-The backend API will run on [http://localhost:8000](http://localhost:8000).
+The backend API will run at [http://localhost:8000](http://localhost:8000).
 
 For detailed instructions, see [`penny-wise-backend/README.md`](penny-wise-backend/README.md).
 
@@ -65,7 +66,7 @@ For detailed instructions, see [`penny-wise-frontend/README.md`](penny-wise-fron
 
 ## Environment Configuration
 
-Make sure the frontend `.env` has the correct backend URL set, for example:
+Make sure the frontend `.env` file has the correct backend URL set, for example:
 
 ```env
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
@@ -83,7 +84,3 @@ This project allows users to:
 - View wallet balances and progress
 
 Happy budgeting with PennyWise! 🎯
-
-```
-
-```
