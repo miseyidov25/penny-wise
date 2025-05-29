@@ -29,6 +29,7 @@ import type { AddRecurringTransactionPayload } from "@/features/transactions/typ
 import { UpdateWalletDialog } from "@/features/transactions/update-wallet-dialog";
 import { useWallet } from "@/features/transactions/use-wallet";
 import { useAuth } from "@/hooks/auth";
+import Goals from "@/components/goals";
 
 export default function Wallet({ params }: { params: { walletId: string } }) {
   useAuth({ middleware: "auth" });
@@ -268,6 +269,9 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
           </section>
         )}
       </main>
+
+      {/* ✅ Goals panel on the right */}
+      {wallet && <Goals walletId={wallet.id} />}
     </div>
   );
 }

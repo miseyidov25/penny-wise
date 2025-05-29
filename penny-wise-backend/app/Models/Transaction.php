@@ -35,4 +35,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Wallet::class);
     }
+
+    public function goal()
+    {
+        return $this->belongsTo(Goal::class);
+    }
 }
