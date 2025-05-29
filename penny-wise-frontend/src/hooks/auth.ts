@@ -2,7 +2,8 @@ import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
-import axios from 'axios';
+
+import { axiosInstance } from "@/lib/axios";
 
 export interface User {
   id: number;
@@ -11,10 +12,6 @@ export interface User {
   role: string;
   currency: string;
 }
-export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
-  withCredentials: true, // VERY IMPORTANT
-});
 
 export async function fetchUser() {
   const response = await axiosInstance.get<User>("/api/user");
