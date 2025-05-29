@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+
 import AddGoalForm from './../features/transactions/add-goal-dialog';
 
 interface Goal {
@@ -54,7 +55,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
     if (walletId) {
       fetchGoals();
     }
-  }, [walletId]);
+  }, [walletId, fetchGoals]);
 
   return (
     <div style={styles.panel}>

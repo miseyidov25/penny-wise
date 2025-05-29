@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import axios from 'axios';
+import React, { useState } from 'react';
 
 interface AddGoalFormProps {
   walletId: number;
@@ -33,24 +33,32 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ walletId, onGoalCreated }) =>
     }
 
     try {
-      await axios.post(
+    await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/goals`,
         {
-          name,
-          target_amount: parseFloat(target_amount),
-          deadline,
-          wallet_id: walletId,
+        name,
+        target_amount: parseFloat(target_amount),
+        deadline,
+        wallet_id: walletId,
         },
         { withCredentials: true }
-      );
-      onGoalCreated();
-      setForm({ name: '', target_amount: '', deadline: '' });
-    } catch (err: any) {
-      const backendMessage = err?.response?.data?.message || 'Failed to create goal';
-      setError(backendMessage);
-    } finally {
-      setLoading(false);
+    );
+    onGoalCreated();
+    setForm({ name: '', target_amount: '', deadline: '' });
+    } catch (err: unknown) {
+    let backendMessage = 'Failed to create goal';
+
+    if (axios.isAxiosError(err)) {
+        backendMessage = err.response?.data?.message || backendMessage;
+    } else if (err instanceof Error) {
+        backendMessage = err.message;
     }
+
+    setError(backendMessage);
+    } finally {
+    setLoading(false);
+    }
+
   };
 
   return (

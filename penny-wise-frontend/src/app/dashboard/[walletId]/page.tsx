@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+import Goals from "@/components/goals";
 import { Header } from "@/components/header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
@@ -29,7 +30,6 @@ import type { AddRecurringTransactionPayload } from "@/features/transactions/typ
 import { UpdateWalletDialog } from "@/features/transactions/update-wallet-dialog";
 import { useWallet } from "@/features/transactions/use-wallet";
 import { useAuth } from "@/hooks/auth";
-import Goals from "@/components/goals";
 
 export default function Wallet({ params }: { params: { walletId: string } }) {
   useAuth({ middleware: "auth" });
