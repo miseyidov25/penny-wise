@@ -19,13 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => explode(',', env('FRONTEND_URLS', 'http://localhost:3000,https://penny-wise-frontend-two.vercel.app')),
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['X-CSRF-TOKEN'],
 
     'max_age' => 0,
 

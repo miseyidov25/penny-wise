@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+import Goals from "@/components/goals";
 import { Header } from "@/components/header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
@@ -268,6 +269,9 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
           </section>
         )}
       </main>
+
+      {/* ✅ Goals panel on the right */}
+      {wallet && <Goals walletId={wallet.id} />}
     </div>
   );
 }
