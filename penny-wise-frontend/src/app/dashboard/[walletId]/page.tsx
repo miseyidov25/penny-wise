@@ -5,6 +5,7 @@ import {
   MagnifyingGlassIcon,
   QuestionMarkIcon,
 } from "@radix-ui/react-icons";
+import { Download, FileUp } from 'lucide-react';
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -18,17 +19,16 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AddTransactionDialog } from "@/features/transactions/add-transaction-dialog";
 import { AddRecurringTransactionDialog } from "@/features/transactions/add-recurring-dialog";
+import { AddTransactionDialog } from "@/features/transactions/add-transaction-dialog";
 import { columns } from "@/features/transactions/columns";
 import { DataTable } from "@/features/transactions/data-table";
 import { DeleteWalletDialog } from "@/features/transactions/delete-wallet-dialog";
 import { TransactionTabs } from "@/features/transactions/transaction-tabs";
+import type { AddRecurringTransactionPayload } from "@/features/transactions/types";
 import { UpdateWalletDialog } from "@/features/transactions/update-wallet-dialog";
 import { useWallet } from "@/features/transactions/use-wallet";
 import { useAuth } from "@/hooks/auth";
-import { Download, FileUp } from 'lucide-react';
-import type { AddRecurringTransactionPayload } from "@/features/transactions/types";
 
 export default function Wallet({ params }: { params: { walletId: string } }) {
   useAuth({ middleware: "auth" });
@@ -102,7 +102,7 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
     const safeName = (wallet.name ?? 'wallet').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${wallet.name}_transactions.xlsx`;
+    a.download = `${safeName}_transactions.xlsx`;
     document.body.appendChild(a);
     a.click();
     a.remove();

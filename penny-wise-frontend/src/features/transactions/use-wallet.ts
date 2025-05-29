@@ -4,12 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 import { axiosInstance } from "@/lib/axios";
 
 import type {
+  AddRecurringTransactionPayload,
   AddTransactionPayload,
   Category,
   UpdateWalletPayload,
-  Wallet,
-  AddRecurringTransactionPayload
-} from "./types";
+  Wallet} from "./types";
 
 export function useWallet(walletId: string) {
   const [wallet, setWallet] = useState<Wallet | null>();

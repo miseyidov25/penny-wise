@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ReloadIcon, PlusIcon } from "@radix-ui/react-icons";
+import { PlusIcon,ReloadIcon } from "@radix-ui/react-icons";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,9 +26,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { addRecurringTransactionSchema } from "./schemas";
 import type { AddRecurringTransactionPayload } from "./types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function AddRecurringTransactionDialog({
   walletId,
