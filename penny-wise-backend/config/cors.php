@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => explode(',', env('FRONTEND_URLS', 'http://localhost:3000,https://penny-wise-frontend-two.vercel.app')),
+    'allowed_origins' => explode(',', env('FRONTEND_URLS', 'https://penny-wise-frontend-two.vercel.app')),
 
     'allowed_origins_patterns' => [],
 
