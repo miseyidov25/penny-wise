@@ -5,15 +5,17 @@ WORKDIR /var/www
 
 # Install system dependencies + GD
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
+    libzip-dev \
     libjpeg-dev \
     libpng-dev \
+    libpq-dev \
     zip \
     unzip \
     git \
     curl \
     && docker-php-ext-configure gd \
-    && docker-php-ext-install pdo pdo_pgsql gd
+    && docker-php-ext-install pdo pdo_pgsql gd zip
+
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
