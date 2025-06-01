@@ -27,7 +27,16 @@ export const addRecurringTransactionSchema = z.object({
   }),
   description: z.string().optional(),
   interval: z.enum(["daily", "weekly", "monthly", "yearly"]),
-  next_run: z.string().min(1, "Start date is required"),
+  start_date: z.string().min(1, "Start date is required"),
+  end_date: z.string().optional(),
+});
+
+export const addRecurringTransactionFormSchema = z.object({
+  category_name: z.string().min(1),
+  amount: z.string().min(1),
+  description: z.string().optional(),
+  interval: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  start_date: z.string().min(1), // required
   end_date: z.string().optional(),
 });
 

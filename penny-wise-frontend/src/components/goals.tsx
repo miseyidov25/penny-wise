@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback,useEffect, useState } from 'react';
 
 import AddGoalForm from './../features/transactions/add-goal-dialog';
 
@@ -19,8 +19,11 @@ interface GoalsProps {
 
 const Goals: React.FC<GoalsProps> = ({ walletId }) => {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [showForm, setShowForm] = useState(false);
 
-  const fetchGoals = async () => {
+  const fetchGoals = useCallback(async () => {
+    if (!walletId) return;
+
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/goals?wallet_id=${walletId}`,
@@ -35,7 +38,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
     } catch (error) {
       console.error('Error fetching goals:', error);
     }
-  };
+  }, [walletId]); // ✅ wrapped with useCallback, stable reference
 
   const handleDelete = async (goalId: number) => {
     if (!confirm('Are you sure you want to delete this goal?')) return;
@@ -44,7 +47,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
       await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/goals/${goalId}`, {
         withCredentials: true,
       });
-      fetchGoals();
+      fetchGoals(); // ✅ no linter warnings now
     } catch (error) {
       console.error('Failed to delete goal:', error);
       alert('Failed to delete goal');
@@ -52,16 +55,29 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
   };
 
   useEffect(() => {
-    if (walletId) {
-      fetchGoals();
-    }
-  }, [walletId, fetchGoals]);
+    fetchGoals(); // ✅ stable due to useCallback
+  }, [fetchGoals]); // ✅ linter is happy
 
   return (
     <div style={styles.panel}>
-      <h2>🎯 Goals</h2>
+    <div style={styles.header}>
+      <h2 style={{ margin: 0 }}>🎯 Goals</h2>
+      <button onClick={() => setShowForm(!showForm)} style={styles.toggleButton}>
+        {showForm ? '✖ Close' : '➕ Add Goal'}
+      </button>
+    </div>
 
-      <AddGoalForm walletId={walletId} onGoalCreated={fetchGoals} />
+    {showForm && (
+      <div style={{ marginBottom: '1rem' }}>
+        <AddGoalForm
+          walletId={walletId}
+          onGoalCreated={() => {
+            fetchGoals();
+            setShowForm(false);
+          }}
+        />
+      </div>
+    )}
 
       {goals.length > 0 ? (
         <ul style={{ paddingLeft: 0 }}>
@@ -71,6 +87,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
                 <div>
                   <strong>{goal.name}</strong><br />
                   {goal.current_amount} / {goal.target_amount} {goal.currency}<br />
+                  <small>Deadline: {new Date(goal.deadline).toLocaleDateString()}</small><br />
                   <progress value={goal.current_amount} max={goal.target_amount}></progress>
                 </div>
                 <button
@@ -119,6 +136,21 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '1.2rem',
     color: 'red',
   },
+  toggleButton: {
+    color: '#fff',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginBottom: '0.5rem',
+  },
+  header: {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '0.5rem',
+  },
+
 };
 
 export default Goals;

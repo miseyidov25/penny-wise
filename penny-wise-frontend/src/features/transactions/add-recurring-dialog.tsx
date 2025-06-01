@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon,ReloadIcon } from "@radix-ui/react-icons";
-import { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -28,8 +28,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { addRecurringTransactionSchema } from "./schemas";
-import type { AddRecurringTransactionPayload } from "./types";
+import { addRecurringTransactionFormSchema} from "./schemas";
+import type { AddRecurringTransactionFormPayload,AddRecurringTransactionPayload } from "./types";
 
 export function AddRecurringTransactionDialog({
   walletId,
@@ -43,36 +43,44 @@ export function AddRecurringTransactionDialog({
 
   categories: string[];
 }) {
-  const form = useForm<AddRecurringTransactionPayload>({
-    resolver: zodResolver(addRecurringTransactionSchema),
-    defaultValues: {
-      category_name: "",
-      amount: "0.00",
-      description: "",
-      interval: "monthly",
-      next_run: new Date().toISOString().split("T")[0],
-      end_date: "",
-    },
-  });
+  const form = useForm<AddRecurringTransactionFormPayload>({
+  resolver: zodResolver(addRecurringTransactionFormSchema),
+  defaultValues: {
+    category_name: "",
+    amount: "0.00",
+    description: "",
+    interval: "monthly",
+    start_date: new Date().toISOString().split("T")[0], // <-- here, use start_date
+    end_date: "",
+  },
+});
+
+  const setRecurringTransactions = useState<AddRecurringTransactionPayload[]>([])[1];
 
   const [isPending, startTransition] = useTransition();
 
-  function onSubmit(values: AddRecurringTransactionPayload) {
-    startTransition(async () => {
-      const result = await addRecurringTransaction({
-      ...values,
-      wallet_id: walletId, // 👈 inject wallet_id into the payload
-    });
+  function onSubmit(values: AddRecurringTransactionFormPayload) {
+  startTransition(async () => {
+    const { start_date, ...rest } = values;
 
-      if (result?.error) {
-        toast.error(result.error);
-        console.log(result);
-      } else {
-        toast.success("Recurring transaction added");
-        form.reset();
-      } 
-    });
-  }
+    const payloadToSend: AddRecurringTransactionPayload = {
+      ...rest,
+      wallet_id: walletId,
+      start_date,
+      next_run: start_date,
+    };
+
+    const result = await addRecurringTransaction(payloadToSend);
+
+    if (result?.error) {
+      toast.error(result.error);
+    } else if (result && !("error" in result)) {
+      toast.success("Recurring transaction added");
+      form.reset();
+      setRecurringTransactions(prev => [...prev, result]);
+    }
+  });
+}
 
   return (
     <Dialog>
@@ -177,12 +185,12 @@ export function AddRecurringTransactionDialog({
 
             <FormField
               control={form.control}
-              name="next_run"
+              name="start_date"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Start Date</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input type="date" {...field} value={field.value ?? ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

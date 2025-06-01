@@ -1,6 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input";
+
 interface AddGoalFormProps {
   walletId: number;
   onGoalCreated: () => void;
@@ -66,29 +69,29 @@ const AddGoalForm: React.FC<AddGoalFormProps> = ({ walletId, onGoalCreated }) =>
       onSubmit={handleSubmit}
       style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
     >
-      <input
+      <Input
         name="name"
         placeholder="Goal name"
         value={form.name}
         onChange={handleChange}
       />
-      <input
+      <Input
         type="number"
         name="target_amount"
         placeholder="Target amount"
         value={form.target_amount}
         onChange={handleChange}
       />
-      <input
+      <Input
         type="date"
         name="deadline"
         value={form.deadline}
         onChange={handleChange}
       />
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      <button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading}>
         {loading ? 'Creating...' : 'Create Goal'}
-      </button>
+      </Button>
     </form>
   );
 };
