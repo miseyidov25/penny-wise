@@ -43,12 +43,21 @@ export interface UpdateWalletPayload {
   currency: string;
 }
 
+// For your frontend form data (with start_date)
+export type AddRecurringTransactionFormPayload = Omit<AddRecurringTransactionPayload, 'next_run' | 'wallet_id'> & {
+  start_date: string;
+};
+
+// For your backend API request (with next_run)
 export type AddRecurringTransactionPayload = {
   wallet_id: number;
   category_name: string;
-  amount: string;
-  description?: string;
+  amount: string; // or number if form returns number
+  description: string;
   interval: "daily" | "weekly" | "monthly" | "yearly";
-  next_run: string;
+  start_date: string;
   end_date?: string;
+  next_run: string;
 };
+
+

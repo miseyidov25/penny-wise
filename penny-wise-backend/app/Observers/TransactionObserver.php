@@ -24,26 +24,22 @@ class TransactionObserver
 
     protected function updateGoalProgress($walletId)
 {
-    $goal = Goal::where('wallet_id', $walletId)->first();
+    $goal = Goal::where('wallet_id', $walletId)->where('is_completed', false)->first();
 
     if ($goal) {
-        $sum = $goal->wallet->transactions()->sum('amount');
+        $wallet = $goal->wallet;
 
-        // Cap current_amount so it does not exceed target_amount
+        // Sum all transactions of this wallet
+        $sum = $wallet->transactions()->sum('amount');
+
         $goal->current_amount = min($sum, $goal->target_amount);
-
-        // Calculate progress percentage capped at 100%
-        $goal->progress_percentage = min(
-            round(($goal->current_amount / $goal->target_amount) * 100, 2),
-            100
-        );
-
-        // Mark as completed if current_amount >= target_amount
+        $goal->progress_percentage = min(round(($goal->current_amount / $goal->target_amount) * 100, 2), 100);
         $goal->is_completed = $goal->current_amount >= $goal->target_amount;
-
         $goal->save();
     }
 }
+
+
 
 
     /**

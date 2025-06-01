@@ -17,7 +17,9 @@ class RecurringTransaction extends Model
     'description',
     'interval',
     'next_run',
+    'start_date',
     'end_date',
+    'type',
 ];
 
 public function user()

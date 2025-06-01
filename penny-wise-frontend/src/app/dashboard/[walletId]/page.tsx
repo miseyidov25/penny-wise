@@ -120,6 +120,7 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
     }
   }, [error]);
 
+  
   async function addRecurringTransaction(payload: AddRecurringTransactionPayload) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/recurring-transactions`, {
@@ -144,7 +145,9 @@ export default function Wallet({ params }: { params: { walletId: string } }) {
       return { error: errorData.message || "Failed to create recurring transaction" };
     }
 
-    return undefined;
+    const data = await response.json();
+    return data;
+
   } catch (error) {
     console.error('Fetch error:', error);
     return { error: "Something went wrong while creating recurring transaction." };

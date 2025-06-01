@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback,useEffect, useState } from 'react';
 
 import AddGoalForm from './../features/transactions/add-goal-dialog';
 
@@ -21,7 +21,9 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchGoals = async () => {
+  const fetchGoals = useCallback(async () => {
+    if (!walletId) return;
+
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/goals?wallet_id=${walletId}`,
@@ -36,7 +38,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
     } catch (error) {
       console.error('Error fetching goals:', error);
     }
-  };
+  }, [walletId]); // ✅ wrapped with useCallback, stable reference
 
   const handleDelete = async (goalId: number) => {
     if (!confirm('Are you sure you want to delete this goal?')) return;
@@ -45,7 +47,7 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
       await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/goals/${goalId}`, {
         withCredentials: true,
       });
-      fetchGoals();
+      fetchGoals(); // ✅ no linter warnings now
     } catch (error) {
       console.error('Failed to delete goal:', error);
       alert('Failed to delete goal');
@@ -53,10 +55,8 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
   };
 
   useEffect(() => {
-    if (walletId) {
-      fetchGoals();
-    }
-  }, [walletId]);
+    fetchGoals(); // ✅ stable due to useCallback
+  }, [fetchGoals]); // ✅ linter is happy
 
   return (
     <div style={styles.panel}>

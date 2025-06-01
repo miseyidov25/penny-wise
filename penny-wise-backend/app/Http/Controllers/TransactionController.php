@@ -256,16 +256,25 @@ public function export()
 public function import(Request $request)
 {
     $request->validate([
-        'file' => 'required|file|mimes:xlsx,csv'
+        'file' => 'required|file|mimes:xlsx,csv',
     ]);
 
     try {
-        Excel::import(new TransactionsImport, $request->file('file'));
+        $user = auth()->user();
+        $wallet = $user->wallets()->firstOrFail();
+
+        Excel::import(new TransactionsImport($user->id, $wallet->id), $request->file('file'));
+
         return response()->json(['message' => 'Imported successfully']);
     } catch (\Exception $e) {
         \Log::error('Import failed: ' . $e->getMessage());
-        return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 500);
+        return response()->json([
+            'message' => 'Import failed',
+            'error' => $e->getMessage(),
+        ], 500);
     }
 }
+
+
 
 }

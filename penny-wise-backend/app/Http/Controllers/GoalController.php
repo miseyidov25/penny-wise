@@ -7,11 +7,25 @@ use App\Models\Wallet;
 
 class GoalController extends Controller
 {
-   public function index()
-    {
-        // Return all goals for the authenticated user with their wallets
-        return auth()->user()->goals()->with('wallet')->get();
+   public function index(Request $request)
+{
+    $user = auth()->user();
+    $walletId = $request->query('wallet_id');
+
+    $query = $user->goals()->with('wallet');
+
+    if ($walletId) {
+        // Ensure the wallet belongs to the user
+        if (!$user->wallets()->where('id', $walletId)->exists()) {
+            abort(403, 'You do not own this wallet.');
+        }
+
+        $query->where('wallet_id', $walletId);
     }
+
+    return $query->get();
+}
+
 
     public function store(Request $request)
     {
