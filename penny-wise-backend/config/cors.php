@@ -15,11 +15,15 @@ return [
     |
     */
 
-    'paths' => ['*'],
-
+    'paths' => ['api/*', 'login', 'logout', 'sanctum/csrf-cookie'],
+    
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => explode(',', env('FRONTEND_URLS', 'https://penny-wise-frontend-two.vercel.app')),
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'https://penny-wise-frontend-two.vercel.app',
+    ],
 
     'allowed_origins_patterns' => [],
 

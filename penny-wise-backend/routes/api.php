@@ -62,3 +62,7 @@ Route::delete('/users/{user}', function (User $user) {
 })->name('users.delete');
 
 Route::get('/convert-currency', [CurrencyController::class, 'convertCurrency']);
+
+Route::get('/debug-env', function () {
+    return env('FRONTEND_URLS');
+});

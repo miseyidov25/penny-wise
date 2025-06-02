@@ -55,6 +55,6 @@ To set up the project locally, follow these steps:
 
 5. **Start the Development Server**
 
-    php artisan serve
+    php artisan serve --host=locahost --port=8000
 
 ### Your backend should now be running at http://localhost:8000.
