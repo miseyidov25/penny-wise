@@ -4,11 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 import { axiosInstance } from "@/lib/axios";
 
 import type {
+  AddRecurringTransactionPayload,
   AddTransactionPayload,
   Category,
   UpdateWalletPayload,
-  Wallet,
-} from "./types";
+  Wallet} from "./types";
 
 export function useWallet(walletId: string) {
   const [wallet, setWallet] = useState<Wallet | null>();
@@ -65,6 +65,23 @@ export function useWallet(walletId: string) {
       return { error: "Failed to add transaction." };
     }
   }
+
+  async function addRecurringTransaction(payload: AddRecurringTransactionPayload) {
+  try {
+    const response = await axiosInstance.post<{ wallet: Wallet }>(
+      `/api/recurring-transactions`,
+      {
+        ...payload,
+        wallet_id: walletId,
+      }
+    );
+
+    setWallet(response.data.wallet);
+    setCategories([...categories, payload.category_name]);
+  } catch {
+    return { error: "Failed to add recurring transaction." };
+  }
+}
 
   async function deleteTransaction(transactionId: number) {
     if (!wallet) {
@@ -130,6 +147,7 @@ export function useWallet(walletId: string) {
 
   return {
     addTransaction,
+    addRecurringTransaction,
     categories,
     deleteTransaction,
     deleteWallet,

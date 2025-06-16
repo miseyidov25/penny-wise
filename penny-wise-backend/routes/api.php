@@ -6,6 +6,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\RecurringTransactionController;
+use App\Http\Controllers\GoalController;
 use App\Models\User;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -29,6 +31,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // 📤 Import/Export (must come BEFORE transactions resource)
     Route::get('/transactions/export', [TransactionController::class, 'export']);
     Route::post('/transactions/import', [TransactionController::class, 'import']);
+
+    // 🔁 Recurring Transaction routes
+    Route::get('/recurring-transactions', [RecurringTransactionController::class, 'index']);
+    Route::post('/recurring-transactions', [RecurringTransactionController::class, 'store']);
+
+    // 🎯 Goal routes
+    Route::apiResource('goals', GoalController::class)->except(['create', 'edit']);
 
     // 💳 Transaction routes
     Route::apiResource('transactions', TransactionController::class)->except(['show']);

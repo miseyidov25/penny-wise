@@ -20,6 +20,26 @@ export const addTransactionSchema = z.object({
   date: z.string().transform((value) => new Date(value).toISOString()),
 });
 
+export const addRecurringTransactionSchema = z.object({
+  category_name: z.string().min(1, "Category is required"),
+  amount: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "Invalid number",
+  }),
+  description: z.string().optional(),
+  interval: z.enum(["daily", "weekly", "monthly", "yearly"]),
+  start_date: z.string().min(1, "Start date is required"),
+  end_date: z.string().optional(),
+});
+
+export const addRecurringTransactionFormSchema = z.object({
+  category_name: z.string().min(1),
+  amount: z.string().min(1),
+  description: z.string().optional(),
+  interval: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  start_date: z.string().min(1), // required
+  end_date: z.string().optional(),
+});
+
 export const addWalletSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   currency: z.string().length(3, "Currency must be a 3-letter code"),

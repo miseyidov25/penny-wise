@@ -4,24 +4,24 @@ PennyWise is a budget management web platform designed to help users efficiently
 
 ## Features
 
-- **User Authentication**: Secure user login and registration.
-- **Wallet Management**: Create, read, update, and delete wallets.
-- **Transaction Tracking**: Log transactions linked to specific wallets, including categories and currencies.
-- **Category Management**: Organize transactions into user-defined categories.
-- **Balance Overview**: View wallet balances and total balance across all wallets.
+-   **User Authentication**: Secure user login and registration.
+-   **Wallet Management**: Create, read, update, and delete wallets.
+-   **Transaction Tracking**: Log transactions linked to specific wallets, including categories and currencies.
+-   **Category Management**: Organize transactions into user-defined categories.
+-   **Balance Overview**: View wallet balances and total balance across all wallets.
 
 ## Technologies Used
 
-- Laravel 11
-- PHP 8.3+
-- Composer
-- Laravel Breeze (API template)
+-   Laravel 11
+-   PHP 8.3+
+-   Composer
+-   Laravel Breeze (API template)
 
 ### Prerequisites
 
-- PHP 8.3+
-- Composer
-- MySQL or another supported database
+-   PHP 8.3+
+-   Composer
+-   MySQL or another supported database
 
 ## Installation
 
@@ -31,11 +31,13 @@ To set up the project locally, follow these steps:
 
 1. **Clone the Repository**
 
-   Open your terminal and run the following command:
+    Open your terminal and run the following command:
 
-   ```bash
-   git clone https://github.com/leonov0/penny-wise-backend
-   cd pennywise
+    ```bash
+    git clone https://github.com/miseyidov25/penny-wise
+    cd pennywise/penny-wise-backend
+
+    ```
 
 2. **Install PHP Dependencies**
 
@@ -55,4 +57,4 @@ To set up the project locally, follow these steps:
 
     php artisan serve
 
-### Your backend should now be running at http://localhost:8000. 
+### Your backend should now be running at http://localhost:8000.

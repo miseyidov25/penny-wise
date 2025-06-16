@@ -9,7 +9,20 @@ class RecurringTransaction extends Model
 {
     use HasFactory;
 
-    public function user()
+    protected $fillable = [
+    'user_id',
+    'wallet_id',
+    'category_id',
+    'amount',
+    'description',
+    'interval',
+    'next_run',
+    'start_date',
+    'end_date',
+    'type',
+];
+
+public function user()
 {
     return $this->belongsTo(User::class);
 }

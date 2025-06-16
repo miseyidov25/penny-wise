@@ -16,6 +16,16 @@ class Wallet extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function goal()
+    {
+        return $this->hasOne(Goal::class);
+    }
+
+    public function recurringTransactions()
+    {
+        return $this->hasMany(RecurringTransaction::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
