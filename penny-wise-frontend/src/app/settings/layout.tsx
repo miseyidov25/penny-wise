@@ -57,21 +57,6 @@ export default function ProfileSettings({
               <span className="ml-2">Profile</span>
             </Link>
 
-            <Link
-              href="/settings/advanced"
-              className={cn(
-                buttonVariants({
-                  variant: pathname.includes("/settings/advanced")
-                    ? "secondary"
-                    : "ghost",
-                }),
-                "justify-start",
-              )}
-            >
-              <MixerHorizontalIcon />
-              <span className="ml-2">Advanced</span>
-            </Link>
-
             {user?.role === "admin" && (
               <Link
                 href="/settings/admin"
