@@ -62,9 +62,13 @@ const Goals: React.FC<GoalsProps> = ({ walletId }) => {
     <div style={styles.panel}>
     <div style={styles.header}>
       <h2 style={{ margin: 0 }}>🎯 Goals</h2>
-      <button onClick={() => setShowForm(!showForm)} style={styles.toggleButton}>
+      <button 
+        onClick={() => setShowForm(!showForm)} 
+        className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+      >
         {showForm ? '✖ Close' : '➕ Add Goal'}
       </button>
+
     </div>
 
     {showForm && (
