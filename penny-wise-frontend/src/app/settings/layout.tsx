@@ -3,7 +3,6 @@
 import { GearIcon } from "@radix-ui/react-icons";
 import {
   LockOpen1Icon,
-  MixerHorizontalIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
 import Link from "next/link";
