@@ -77,8 +77,7 @@ class TransactionController extends Controller
 
         $isExpense = $validated['amount'] < 0;
 
-        // Convert transaction amount to wallet's currency if necessary
-        $convertedAmount = $this->currencyService->convertForWallet('EUR', $wallet->currency, $validated['amount']);
+        $amount = $validated['amount']; // No conversion
 
         if ($isExpense) {
             $wallet->balance -= abs($convertedAmount);

@@ -172,23 +172,34 @@ class WalletController extends Controller
             'currency' => 'required|string|size:3',
         ]);
     
-        // Update the wallet with the new name and currency
         $wallet->name = $validated['name'];
         $newCurrency = $validated['currency'];
-        
-        // Get the current currency of the wallet
         $currentCurrency = $wallet->currency;
     
-        // Update the wallet currency
-        $wallet->currency = $newCurrency;
-        $wallet->save(); // Save changes
-    
-        // Update all associated transactions with the new currency
-        foreach ($wallet->transactions as $transaction) {
-            // You may need to implement a currency conversion function if applicable
-            $transaction->currency = $newCurrency;
-            $transaction->save(); // Save the updated transaction
+        // Only proceed if currency is actually changing
+        if ($newCurrency !== $currentCurrency) {
+            // Convert wallet balance to new currency
+            $wallet->balance = $this->currencyService->convertForWallet($currentCurrency, $newCurrency, $wallet->balance);
+            $wallet->currency = $newCurrency;
+            $wallet->save();
+
+            // Convert all transactions to the new currency
+            foreach ($wallet->transactions as $transaction) {
+                $convertedAmount = $this->currencyService->convertForWallet(
+                    $transaction->currency,
+                    $newCurrency,
+                    $transaction->amount
+                );
+
+                $transaction->amount = $convertedAmount;
+                $transaction->currency = $newCurrency;
+                $transaction->save();
+            }
+        } else {
+            // If only name changed
+            $wallet->save();
         }
+    
     
         // Load the wallet's transactions
         $wallet->load('transactions'); // Eager load the transactions relationship
