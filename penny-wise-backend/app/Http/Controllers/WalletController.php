@@ -195,6 +195,20 @@ class WalletController extends Controller
                 $transaction->currency = $newCurrency;
                 $transaction->save();
             }
+
+            // Update all goals currency to the new currency
+            foreach ($wallet->goals as $goal) {
+                // Convert target amount
+                $goal->target_amount = $this->currencyService->convertForWallet($goal->currency, $newCurrency, $goal->target_amount);
+
+                // Convert progress amount (change this to your actual field/property name)
+                if (isset($goal->progress_amount)) {
+                    $goal->progress_amount = $this->currencyService->convertForWallet($goal->currency, $newCurrency, $goal->progress_amount);
+                }
+
+                $goal->currency = $newCurrency;
+                $goal->save();
+            }
         } else {
             // If only name changed
             $wallet->save();
@@ -202,7 +216,7 @@ class WalletController extends Controller
     
     
         // Load the wallet's transactions
-        $wallet->load('transactions'); // Eager load the transactions relationship
+        $wallet->load('transactions', 'goals'); // Eager load the transactions relationship
     
         // Return the updated wallet with its transactions
         return response()->json([
