@@ -16,20 +16,37 @@ class CurrencyConversionService
     }
 
     public function convert($from, $to, $amount)
-    {
-        $response = Http::get($this->baseUrl, [
-            'apikey' => $this->apiKey,
-            'currencies' => $to,
-            'base_currency' => $from
-        ]);
+{
+    $response = Http::withOptions(['verify' => false])->get($this->baseUrl, [
+        'apikey' => $this->apiKey,
+        'currencies' => $to,
+        'base_currency' => $from
+    ]);
 
-        if ($response->successful()) {
-            $rate = $response->json()['data'][$to]['value'];
+    \Log::info('Currency API response:', [
+        'status' => $response->status(),
+        'body' => $response->body()
+    ]);
+
+    if ($response->successful()) {
+        $data = $response->json();
+
+        if (isset($data['data'][$to]['value'])) {
+            $rate = $data['data'][$to]['value'];
             return $amount * $rate;
+        } else {
+            \Log::error('Currency rate not found in API response.', $data);
         }
-
-        throw new \Exception('Currency conversion failed.');
+    } else {
+        \Log::error('Currency API call unsuccessful.', [
+            'status' => $response->status(),
+            'body' => $response->body()
+        ]);
     }
+
+    throw new \Exception('Currency conversion failed.');
+}
+
 
     public function convertForWallet($walletCurrency, $targetCurrency, $amount)
 {

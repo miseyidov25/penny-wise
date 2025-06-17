@@ -43,85 +43,88 @@ class TransactionController extends Controller
 
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'wallet_id' => 'required|exists:wallets,id',
-            'category_name' => 'required|string|max:255',
-            'amount' => [
-                'required',
-                'numeric',
-                'min:-99999999',
-                'max:99999999',
-                function ($attribute, $value, $fail) {
-                    if ($value == 0) {
-                        $fail('The amount cannot be zero.');
-                    }
-                },
-            ],
-            'description' => 'nullable|string',
-            'date' => 'required|date',
-        ]);
+{
+    $validated = $request->validate([
+        'wallet_id' => 'required|exists:wallets,id',
+        'category_name' => 'required|string|max:255',
+        'amount' => [
+            'required',
+            'numeric',
+            'min:-99999999',
+            'max:99999999',
+            function ($attribute, $value, $fail) {
+                if ($value == 0) {
+                    $fail('The amount cannot be zero.');
+                }
+            },
+        ],
+        'description' => 'nullable|string',
+        'date' => 'required|date',
+    ]);
 
-        $wallet = Wallet::where('id', $validated['wallet_id'])
-                        ->where('user_id', Auth::id())
-                        ->first();
+    $wallet = Wallet::where('id', $validated['wallet_id'])
+                    ->where('user_id', Auth::id())
+                    ->first();
 
-        if (!$wallet) {
-            return response()->json(['error' => 'Unauthorized: Wallet does not belong to the authenticated user.'], 403);
-        }
-
-        $category = Category::firstOrCreate([
-            'name' => $validated['category_name'],
-            'user_id' => Auth::id(),
-        ]);
-
-        $isExpense = $validated['amount'] < 0;
-
-        $amount = $validated['amount']; // No conversion
-
-        if ($isExpense) {
-            $wallet->balance -= abs($convertedAmount);
-        } else {
-            $wallet->balance += $convertedAmount;
-        }
-
-        $wallet->save();
-
-        $transaction = Transaction::create([
-            'user_id' => Auth::id(),
-            'category_id' => $category->id,
-            'wallet_id' => $wallet->id,
-            'amount' => $convertedAmount,
-            'description' => $validated['description'],
-            'date' => $validated['date'],
-            'currency' => $wallet->currency,
-        ]);
-
-        $wallet->load(['transactions.category']);
-
-        $walletWithTransactions = $wallet->transactions->map(function ($transaction) {
-            return [
-                'id' => $transaction->id,
-                'amount' => $transaction->amount,
-                'description' => $transaction->description,
-                'date' => $transaction->date,
-                'currency' => $transaction->currency,
-                'category_name' => $transaction->category->name,
-            ];
-        });
-
+    if (!$wallet) {
         return response()->json([
-            'success' => true,
-            'message' => 'Transaction created successfully.',
-            'wallet' => [
-                'id' => $wallet->id,
-                'name' => $wallet->name,
-                'balance' => $wallet->balance,
-                'currency' => $wallet->currency,
-                'transactions' => $walletWithTransactions
-            ]
-        ], 201);
+            'error' => 'Unauthorized: Wallet does not belong to the authenticated user.'
+        ], 403);
     }
+
+    $category = Category::firstOrCreate([
+        'name' => $validated['category_name'],
+        'user_id' => Auth::id(),
+    ]);
+
+    $amount = $validated['amount'];
+    $isExpense = $amount < 0;
+
+    // Update wallet balance
+    if ($isExpense) {
+        $wallet->balance -= abs($amount);
+    } else {
+        $wallet->balance += $amount;
+    }
+
+    $wallet->save();
+
+    $transaction = Transaction::create([
+        'user_id' => Auth::id(),
+        'category_id' => $category->id,
+        'wallet_id' => $wallet->id,
+        'amount' => $amount,
+        'description' => $validated['description'],
+        'date' => $validated['date'],
+        'currency' => $wallet->currency,
+    ]);
+
+    $wallet->load(['transactions.category']);
+
+    $walletWithTransactions = $wallet->transactions->map(function ($transaction) {
+        return [
+            'id' => $transaction->id,
+            'amount' => $transaction->amount,
+            'description' => $transaction->description,
+            'date' => $transaction->date,
+            'currency' => $transaction->currency,
+            'category_name' => $transaction->category->name,
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Transaction created successfully.',
+        'wallet' => [
+            'id' => $wallet->id,
+            'name' => $wallet->name,
+            'balance' => $wallet->balance,
+            'currency' => $wallet->currency,
+            'transactions' => $walletWithTransactions
+        ]
+    ], 201);
+}
+
 
     public function update(Request $request, Transaction $transaction)
     {
@@ -262,7 +265,13 @@ public function import(Request $request)
         $user = auth()->user();
         $wallet = $user->wallets()->firstOrFail();
 
-        Excel::import(new TransactionsImport($user->id, $wallet->id), $request->file('file'));
+        $currencyConversionService = new CurrencyConversionService();
+
+        Excel::import(new TransactionsImport($user->id, $wallet->id, $currencyConversionService), $request->file('file'));
+
+        // Update wallet balance after import
+        $wallet->balance = $wallet->transactions()->sum('amount');
+        $wallet->save();
 
         return response()->json(['message' => 'Imported successfully']);
     } catch (\Exception $e) {
